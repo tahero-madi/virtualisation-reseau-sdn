@@ -1,0 +1,11 @@
+# Correspondance : h1 dev, h2 recette, h3 prod, h4 admin (Mininet --mac)
+autorisations:
+  - nom: dev-vers-recette
+    de: "00:00:00:00:00:01"
+    vers: "00:00:00:00:00:02"
+  - nom: admin-vers-recette
+    de: "00:00:00:00:00:04"
+    vers: "00:00:00:00:00:02"
+  - nom: admin-vers-prod
+    de: "00:00:00:00:00:04"
+    vers: "00:00:00:00:00:03"

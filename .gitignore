@@ -1,0 +1,9 @@
+# Captures et fichiers produits pendant les TP
+*.pcap
+*.pcapng
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+osken/
