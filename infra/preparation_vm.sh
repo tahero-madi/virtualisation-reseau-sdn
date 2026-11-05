@@ -8,7 +8,7 @@
 #
 # Options :
 #   --secondaire                 lab-b : Open vSwitch et outils réseau seulement (ni bureau, ni Docker, ni ONOS, ni os-ken)
-#   --kit CHEMIN                 copie le kit des TP dans ~/lab : le zip kit_tp_1-041.zip ou le dossier kit/ du dépôt
+#   --kit CHEMIN                 copie les scripts des TP à plat dans ~/lab : le dépôt cloné ou l'archive kit_tp_1-041.zip
 #   --sans-bureau                lab-a sans bureau XFCE, ni xrdp, ni Firefox (accès terminal seul)
 #   --pair IP                    contrôle aussi le lien vers l'autre machine : ping et MTU de 1 500 sans fragmentation
 #   --underlay IFACE IP/MASQUE   infra perso avec une 2e carte dédiée au TP2-B, ex. --underlay ens19 192.168.50.11/24
@@ -145,15 +145,15 @@ installer_kit() {
   [[ -e "$KIT" ]] || { echo "Kit introuvable : $KIT" >&2; exit 1; }
   tmp="$(mktemp -d)"
   if [[ -d "$KIT" ]]; then
-    cp -r "$KIT"/. "$tmp"/          # dossier kit/ du dépôt Git
+    cp -r "$KIT"/. "$tmp"/          # dépôt cloné, ou dossier de scripts
   else
     unzip -q -o "$KIT" -d "$tmp"    # archive kit_tp_1-041.zip
   fi
-  src="$(dirname "$(find "$tmp" -name ring.py -print -quit)")"
-  [[ -n "$src" && -f "$src/ring.py" ]] || { echo "Le zip ne contient pas ring.py : est-ce bien le kit 1-041 ?" >&2; exit 1; }
-  en_cible mkdir -p "$HOME_CIBLE/lab/formateur"
-  cp -r "$src"/. "$HOME_CIBLE/lab/"
-  [[ -d "$src/../formateur" ]] && cp -r "$src/../formateur"/. "$HOME_CIBLE/lab/formateur/"
+  [[ -n "$(find "$tmp" -name ring.py -print -quit)" ]] || { echo "ring.py introuvable : est-ce bien le dépôt 1-041 ?" >&2; exit 1; }
+  # le dépôt range les scripts par sous-TP (tp3a/ring.py, …) ; on les rassemble à plat dans ~/lab
+  en_cible mkdir -p "$HOME_CIBLE/lab"
+  find "$tmp" -type f \( -name '*.py' -o -name '*.sh' -o -name '*.yaml' -o -name '*.txt' \) \
+       -not -path '*/.git/*' -exec cp -t "$HOME_CIBLE/lab/" {} +
   chown -R "$CIBLE:" "$HOME_CIBLE/lab"
   chmod +x "$HOME_CIBLE/lab"/*.sh "$HOME_CIBLE/lab"/*.py 2> /dev/null || true
   # dépôt Git local : chaque stagiaire y versionne ses scripts (environnements isolés, pas de dépôt partagé)

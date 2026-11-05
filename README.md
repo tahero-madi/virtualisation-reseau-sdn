@@ -1,38 +1,57 @@
-# Virtualisation des réseaux, SDN et OpenFlow — travaux pratiques
+# Virtualisation des réseaux, SDN et OpenFlow · Travaux pratiques
 
-Énoncés et scripts des travaux pratiques de la formation **1-041 « Virtualisation des réseaux, SDN, OpenFlow »** (2 jours). On y construit des réseaux virtuels sous Linux (namespaces, Open vSwitch, VLAN, VXLAN), on pilote une topologie Mininet avec le contrôleur ONOS, puis on programme un switch en OpenFlow, à la main et avec une application Python os-ken.
+Formation 1-041, deux jours. Neuf travaux pratiques et une mise en situation finale : on construit des réseaux virtuels sous Linux (namespaces, Open vSwitch, VLAN, VXLAN), on pilote une topologie Mininet avec le contrôleur ONOS, puis on programme un switch en OpenFlow, à la main et avec une application Python os-ken.
 
-## Les TP
+## Comment travailler
 
-| TP | Sujet | Durée | Énoncé |
-| --- | --- | --- | --- |
-| — | Préparer son poste, habitudes de travail | — | [00-preparer-son-poste.md](enonces/00-preparer-son-poste.md) |
-| TP1 | Un réseau virtuel (TP1-A) et un pare-feu virtualisé, une VNF (TP1-B) | 1 h 15 | [tp1-reseau-virtuel-et-vnf.md](enonces/tp1-reseau-virtuel-et-vnf.md) |
-| TP2 | VLAN et routage entre zones (TP2-A), overlay VXLAN entre deux hyperviseurs (TP2-B) | 2 h 10 | [tp2-vlan-et-vxlan.md](enonces/tp2-vlan-et-vxlan.md) |
-| TP3 | Contrôleur ONOS (TP3-A), intentions et résilience (TP3-B), politique en YAML (TP3-C) | 1 h 45 | [tp3-controleur-onos.md](enonces/tp3-controleur-onos.md) |
-| TP4 | Règles OpenFlow à la main (TP4-A), application de contrôle Python (TP4-B), mise en situation finale | 1 h 10 + 30 min | [tp4-openflow-et-mise-en-situation.md](enonces/tp4-openflow-et-mise-en-situation.md) |
-| — | Pannes fréquentes et remèdes | — | [depannage.md](enonces/depannage.md) |
+- **Lisez l'énoncé ici**, sur GitHub, dans le navigateur de lab-a. Chaque bloc de commandes a un bouton de copie en haut à droite.
+- **Tapez ou collez les commandes dans la console de lab-a**, en « Bureau distant » ou en « Terminal SSH ».
+- Commencez par [Avant de commencer](avant-de-commencer.md) : vos deux machines, les habitudes de travail et l'installation.
 
-Chaque TP se termine par un script rejouable, versionné dans Git : c'est le livrable.
+## Récupérer les fichiers sur lab-a
+
+Sur les machines de la formation, tout est déjà installé et les scripts sont dans `~/lab`. Pour cloner le dépôt sur votre propre machine :
+
+```bash
+sudo apt-get update -q && sudo apt-get install -y git
+git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
+ls ~/lab                     # un dossier par TP, plus infra/
+```
+
+Si le formateur modifie un fichier pendant la formation, `cd ~/lab && git pull` récupère la nouvelle version.
+
+## Programme des TP
+
+| Quand | TP | Durée |
+| --- | --- | --- |
+| **Jour 1 · Module 1 — Virtualiser le réseau** | | |
+| Jour 1, 09:40 | [TP1-A — Un réseau virtuel en dix commandes](tp1a/README.md) | 45 min |
+| Jour 1, 10:35 | [TP1-B — Un pare-feu virtualisé](tp1b/README.md) | 30 min |
+| **Jour 1 · Module 2 — Architecture et normalisation** | | |
+| Jour 1, 13:30 | [TP2-A — VLAN, routage et filtrage entre zones](tp2a/README.md) | 65 min |
+| Jour 1, 14:45 | [TP2-B — Overlay VXLAN entre lab-a et lab-b](tp2b/README.md) | 65 min |
+| **Jour 2 · Module 3 — Piloter le réseau par un contrôleur** | | |
+| Jour 2, 09:57 | [TP3-A — Prendre en main ONOS](tp3a/README.md) | 45 min |
+| Jour 2, 10:52 | [TP3-B — Intentions et résilience](tp3b/README.md) | 40 min |
+| Jour 2, 11:32 | [TP3-C — La politique comme du code](tp3c/README.md) | 18 min |
+| **Jour 2 · Module 4 — Programmer en OpenFlow** | | |
+| Jour 2, 13:50 | [TP4-A — Programmer un switch à la main](tp4a/README.md) | 45 min |
+| Jour 2, 14:50 | [TP4-B — Une application de contrôle en Python](tp4b/README.md) | 25 min |
+| Jour 2, 15:15 | [Mise en situation finale](mise-en-situation/README.md) | 30 min |
+
+En cas de problème : [En cas de blocage](en-cas-de-blocage.md).
 
 ## Contenu du dépôt
 
-```text
-enonces/   les énoncés, un fichier par TP
-kit/       les fichiers fournis aux stagiaires
-infra/     le script de préparation des machines
-```
-
-| Fichier | Rôle |
+| Dossier ou fichier | Contenu |
 | --- | --- |
-| [`kit/ring.py`](kit/ring.py) | Topologie Mininet en anneau, 4 switches et 4 hôtes (TP3) |
-| [`kit/politique.yaml`](kit/politique.yaml) | Politique de connectivité entre zones (TP3-C) |
-| [`kit/apply_policy.py`](kit/apply_policy.py) | Applique la politique YAML par l'API REST d'ONOS (TP3-C) |
-| [`kit/switch_acl.py`](kit/switch_acl.py) | Application os-ken : switch apprenant avec filtrage (TP4-B) |
-| [`kit/lancer_controleur.py`](kit/lancer_controleur.py) | Lanceur d'applications os-ken, à la place d'`osken-manager` (TP4-B) |
-| [`kit/reset_lab.sh`](kit/reset_lab.sh) | Remise à zéro : supprime tous les namespaces et bridges OVS, Mininet et ONOS |
-| [`kit/preparation_lab.sh`](kit/preparation_lab.sh) | Installation minimale sur une seule machine |
-| [`infra/preparation_vm.sh`](infra/preparation_vm.sh) | Installation complète et contrôles des deux machines du lab |
+| `tp1a/` … `tp4b/`, `mise-en-situation/` | L'énoncé du TP (`README.md`) et ses fichiers |
+| `tp3a/ring.py` | Topologie Mininet en anneau, 4 switches et 4 hôtes (TP3) |
+| `tp3c/apply_policy.py`, `tp3c/politique.yaml` | Politique de connectivité et son application par l'API REST d'ONOS (TP3-C) |
+| `tp4b/switch_acl.py`, `tp4b/lancer_controleur.py` | Application os-ken (switch apprenant avec filtrage) et son lanceur (TP4-B) |
+| `reset_lab.sh` | Remise à zéro : supprime tous les namespaces et bridges OVS, Mininet et ONOS |
+| `infra/preparation_vm.sh` | Installation complète et contrôles des deux machines du lab |
+| `infra/preparation_lab.sh` | Installation minimale sur une seule machine |
 
 > **Attention :** `reset_lab.sh` supprime **tous** les namespaces et bridges Open vSwitch de la machine. À n'utiliser que sur une machine de laboratoire.
 
@@ -45,26 +64,21 @@ Les TP se font sur **lab-a** ; **lab-b** ne sert qu'au TP2-B, comme second hyper
 | lab-a | Tous les TP : Open vSwitch, Mininet, Docker et ONOS 2.7.0, os-ken, bureau XFCE et Firefox | 4 vCPU, 8 Go de RAM, 40 Go | Ubuntu 24.04 LTS |
 | lab-b | Second hyperviseur du TP2-B : Open vSwitch et outils réseau | 2 vCPU, 2 Go de RAM, 20 Go | Ubuntu 24.04 LTS Server |
 
-Sur les machines de la formation, tout est déjà installé et le kit est dans `~/lab`. Pour refaire le lab chez vous, sur deux VM KVM, VMware ou VirtualBox (pas de conteneurs LXC : les TP chargent des modules noyau) :
+Pour refaire le lab chez vous, sur deux VM KVM, VMware ou VirtualBox (pas de conteneurs LXC : les TP chargent des modules noyau) :
 
 ```bash
 # Sur lab-a
-git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git
-cd virtualisation-reseau-sdn
-sudo bash infra/preparation_vm.sh --kit kit     # installe tout, copie kit/ dans ~/lab (dépôt Git local)
-sudo reboot
+git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
+sudo bash ~/lab/infra/preparation_vm.sh --kit ~/lab    # installe tout, rassemble les scripts dans ~/lab
 
 # Sur lab-b
-git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git
-sudo bash virtualisation-reseau-sdn/infra/preparation_vm.sh --secondaire   # installation légère
+sudo bash ~/lab/infra/preparation_vm.sh --secondaire   # installation légère
 
 # Sur lab-a, une fois lab-b prête : ping et MTU 1 500 entre les deux machines
-sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
+sudo bash ~/lab/infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
 ```
 
-Options utiles de `preparation_vm.sh` : `--sans-bureau` (lab-a sans interface graphique), `--test-onos` (démarre ONOS une fois pour vérifier son API), `--underlay IFACE IP/MASQUE` (seconde carte réseau dédiée au TP2-B). `sudo bash infra/preparation_vm.sh --help` les détaille. Avec une seule machine, le TP2-B se fait en « variante seule », deux namespaces jouant les hyperviseurs.
-
-L'interface web d'ONOS s'ouvre dans le navigateur de lab-a : `http://localhost:8181/onos/ui` (onos / rocks).
+`sudo bash infra/preparation_vm.sh --help` détaille les options (`--sans-bureau`, `--test-onos`, `--underlay`). Avec une seule machine, le TP2-B se fait en « variante seule », deux namespaces jouant les hyperviseurs. L'interface web d'ONOS s'ouvre dans le Firefox de lab-a : `http://localhost:8181/onos/ui` (onos / rocks).
 
 ## Versions testées
 

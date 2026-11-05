@@ -1,6 +1,6 @@
-# Dépannage
+# En cas de blocage
 
-Les scripts fournis sont dans le dossier [`kit/`](../kit/). Les applications Python ont été testées avec os-ken 4.2.2 sous Python 3.13, face à un switch OpenFlow 1.3.
+Les applications Python ont été testées avec os-ken 4.2.2 sous Python 3.13, face à un switch OpenFlow 1.3.
 
 | Symptôme | Cause probable | Remède |
 | --- | --- | --- |
@@ -14,6 +14,4 @@ Les scripts fournis sont dans le dossier [`kit/`](../kit/). Les applications Pyt
 | Le ping passe, le transfert bloque | MTU de l'overlay | MTU des interfaces à 1 450, ou underlay à 1 550 et plus |
 | Meter sans effet | Datapath sans prise en charge des meters | `ovs-ofctl -O OpenFlow13 meter-features s1` |
 
----
-
-[← TP4](tp4-openflow-et-mise-en-situation.md) · [Sommaire](../README.md)
+Toujours bloqué ? Notez la commande, le message d'erreur exact et ce que vous attendiez, puis appelez le formateur. Un **instantané** Hexceos pris avant le TP vous ramène en quelques secondes à un état sain.
