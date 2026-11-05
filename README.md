@@ -8,6 +8,12 @@ Formation 1-041, deux jours. Neuf travaux pratiques et une mise en situation fin
 - **Tapez ou collez les commandes dans la console de lab-a**, en « Bureau distant » ou en « Terminal SSH ».
 - Commencez par [Avant de commencer](avant-de-commencer.md) : vos deux machines, les habitudes de travail et l'installation.
 
+## Corrigés
+
+Chaque TP a son corrigé dans un sous-dossier `corrige/` : `tp2b/corrige/` pour le TP2-B, par exemple. Il reprend les réponses aux questions et, pour la mise en situation, une solution complète (`regles_solution.txt`).
+
+Cherchez d'abord par vous-même : le corrigé sert à vous débloquer, ou à vérifier votre travail à la fin du TP.
+
 ## Récupérer les fichiers sur lab-a
 
 Sur les machines de la formation, tout est déjà installé et les scripts sont dans `~/lab`. Pour cloner le dépôt sur votre propre machine :
@@ -83,7 +89,3 @@ sudo bash ~/lab/infra/preparation_vm.sh --verifier-seulement --pair <adresse de 
 ## Versions testées
 
 Ubuntu 24.04 LTS, Open vSwitch et Mininet des dépôts Ubuntu, ONOS 2.7.0 (image Docker `onosproject/onos:2.7.0`), os-ken 4.2.2 sous Python 3, OpenFlow 1.3.
-
-## Corrigés
-
-Les corrigés des TP et de la mise en situation sont réservés au formateur et ne sont pas publiés dans ce dépôt.

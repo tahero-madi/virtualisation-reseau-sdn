@@ -1,0 +1,16 @@
+# Corrigé de la mise en situation finale (topologie single,4)
+# Prérequis :
+#   ovs-ofctl -O OpenFlow13 add-group s1 group_id=1,type=all,bucket=output:1,bucket=output:4
+#   ovs-ofctl -O OpenFlow13 add-meter s1 meter=1,kbps,band=type=drop,rate=10000
+# Application : ovs-ofctl -O OpenFlow13 replace-flows s1 regles_solution.txt
+priority=0,actions=drop
+priority=100,arp,actions=flood
+priority=100,ip,nw_dst=10.0.0.1,actions=group:1
+priority=100,ip,nw_dst=10.0.0.2,actions=output:2
+priority=100,ip,nw_dst=10.0.0.3,actions=output:3
+priority=100,ip,nw_dst=10.0.0.4,actions=output:4
+# Recette -> prod : TCP 443 uniquement
+priority=300,tcp,nw_src=10.0.0.3,nw_dst=10.0.0.1,tp_dst=443,actions=group:1
+priority=250,ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,actions=drop
+# Dev -> prod : limité à 10 Mbit/s, toujours copié vers la sonde
+priority=200,ip,nw_src=10.0.0.2,nw_dst=10.0.0.1,actions=meter:1,group:1
