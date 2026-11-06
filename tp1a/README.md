@@ -4,7 +4,7 @@
 
 ## Installation des outils (une seule fois, pour les deux jours)
 
-Votre machine lab-a est un Ubuntu 24.04 vierge : le bureau et Firefox, mais aucun outil réseau. On les installe maintenant. Dans un **premier terminal** :
+Votre machine lab-a est un Ubuntu 24.04 vierge : le bureau et Firefox, mais aucun outil réseau. On les installe maintenant :
 
 ```bash
 sudo apt-get update && sudo apt-get install -y git
@@ -13,7 +13,14 @@ cd ~/lab
 sudo bash infra/preparation_vm.sh --kit "$PWD" --sans-bureau
 ```
 
-On se place dans `~/lab` puis on lance avec un chemin relatif : sous `sudo`, un `~` pointerait vers `/root`, pas vers votre dossier. Le script installe d'abord Open vSwitch (quelques minutes), puis continue à télécharger l'image ONOS et os-ken, dont vous aurez besoin au jour 2. **Dès que s'affiche `[ OK ] Open vSwitch répond`, ouvrez un second terminal et commencez le TP ci-dessous** ; laissez le premier terminal finir le téléchargement. À la fin, quand le script affiche son bilan, prenez un **instantané « outils installés »** : en cas de problème, vous y reviendrez plutôt qu'à la machine vierge.
+On se place dans `~/lab` puis on lance avec un chemin relatif : sous `sudo`, un `~` pointerait vers `/root`, pas vers votre dossier. Le script installe tout le lab, en quelques minutes :
+
+- **Open vSwitch** et **Mininet** — les commutateurs virtuels et les topologies ;
+- **Docker** et l'image du contrôleur **ONOS 2.7.0**, utilisée au jour 2 ;
+- un environnement Python **os-ken** dans `~/osken`, pour le jour 2 ;
+- les outils d'observation : **nftables**, **tcpdump**, **tshark**, **iperf**, **jq**, **git**.
+
+À la fin, le script affiche `Installation terminée : tout est prêt`, après une série de contrôles. Prenez alors un **instantané « outils installés »** : en cas de pépin pendant un TP, vous y reviendrez plutôt qu'à la machine vierge.
 
 ## L'exercice
 
