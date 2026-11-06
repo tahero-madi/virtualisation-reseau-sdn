@@ -5,7 +5,7 @@
 Le chef de projet ouvre une demande de changement sur le switch s1 :
 
 ```bash
-sudo mn --topo single,4 --mac --switch ovs,protocols=OpenFlow13 --controller none
+sudo mn --topo single,4 --mac --switch ovs,protocols=OpenFlow13 --controller none   # 1 switch, 4 hôtes, sans contrôleur : à vous de poser les règles
 ```
 
 h1 est le serveur prod, h2 le poste dev, h3 le poste recette, h4 une sonde de détection d'intrusion.

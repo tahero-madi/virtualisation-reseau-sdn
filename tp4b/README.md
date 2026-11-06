@@ -5,19 +5,19 @@
 Remplacer les règles manuelles par l'application `switch_acl.py` : elle apprend les adresses MAC (mode réactif) et pose la politique au branchement du switch (mode proactif).
 
 ```bash
-# Terminal 1 : le contrôleur (port 6653 libre : ONOS arrêté)
-~/osken/bin/python lancer_controleur.py switch_acl.py
+# Terminal 1 : le contrôleur (port 6653 libre : ONOS arrêté — sinon sudo docker stop onos)
+~/osken/bin/python lancer_controleur.py switch_acl.py    # lance votre application os-ken ; elle attend les switches
 
 # Terminal 2 : capture du dialogue OpenFlow, puis topologie
-sudo tcpdump -i lo -w of.pcap tcp port 6653 &
-sudo mn -c
+sudo tcpdump -i lo -w of.pcap tcp port 6653 &            # enregistre les échanges switch <-> contrôleur (port 6653)
+sudo mn -c                                               # nettoie Mininet
 sudo mn --topo single,3 --mac --switch ovs,protocols=OpenFlow13 \
-        --controller remote,ip=127.0.0.1,port=6653
-mininet> pingall
+        --controller remote,ip=127.0.0.1,port=6653       # 1 switch, 3 hôtes, pilotés par VOTRE contrôleur
+mininet> pingall                                         # déclenche les échanges : PacketIn, FlowMod, etc.
 
-# Après la sortie de Mininet
-sudo pkill tcpdump
-tshark -r of.pcap -Y openflow_v4 -T fields -e openflow_v4.type | sort | uniq -c
+# Après la sortie de Mininet (commande « exit »)
+sudo pkill tcpdump                                                              # arrête la capture
+tshark -r of.pcap -Y openflow_v4 -T fields -e openflow_v4.type | sort | uniq -c # compte chaque type de message OpenFlow
 ```
 
 Questions :

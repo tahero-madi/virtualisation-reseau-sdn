@@ -28,33 +28,33 @@ Relier deux machines isolées, h1 et h2 (zone dev), par un commutateur Open vSwi
 
 ```bash
 # 1. Deux machines isolées et un commutateur virtuel
-sudo ip netns add h1
-sudo ip netns add h2
-sudo ovs-vsctl add-br br-lab
+sudo ip netns add h1            # crée « h1 », une machine isolée (network namespace : sa propre pile réseau)
+sudo ip netns add h2            # idem pour « h2 »
+sudo ovs-vsctl add-br br-lab    # crée le commutateur virtuel Open vSwitch « br-lab »
 
-# 2. Un câble virtuel par machine
+# 2. Un câble virtuel (paire veth) par machine, branché sur le commutateur
 for h in h1 h2; do
-  sudo ip link add ${h}-eth0 type veth peer name ${h}-port
-  sudo ip link set ${h}-eth0 netns $h
-  sudo ovs-vsctl add-port br-lab ${h}-port
-  sudo ip link set ${h}-port up
-  sudo ip -n $h link set lo up
-  sudo ip -n $h link set ${h}-eth0 up
+  sudo ip link add ${h}-eth0 type veth peer name ${h}-port   # câble à deux bouts : -eth0 (côté machine), -port (côté switch)
+  sudo ip link set ${h}-eth0 netns $h                        # pousse le bout -eth0 dans la machine h
+  sudo ovs-vsctl add-port br-lab ${h}-port                   # branche l'autre bout sur le commutateur
+  sudo ip link set ${h}-port up                              # active le port côté commutateur
+  sudo ip -n $h link set lo up                               # active la boucle locale dans la machine
+  sudo ip -n $h link set ${h}-eth0 up                        # active l'interface réseau dans la machine
 done
 
 # 3. Adressage et test
-sudo ip -n h1 addr add 10.10.10.1/24 dev h1-eth0
-sudo ip -n h2 addr add 10.10.10.2/24 dev h2-eth0
-sudo ip netns exec h1 ping -c 3 10.10.10.2
+sudo ip -n h1 addr add 10.10.10.1/24 dev h1-eth0   # attribue une adresse IP à h1
+sudo ip -n h2 addr add 10.10.10.2/24 dev h2-eth0   # attribue une adresse IP à h2
+sudo ip netns exec h1 ping -c 3 10.10.10.2         # depuis h1, ping h2 : valide le lien à travers le commutateur
 ```
 
 Observer :
 
 ```bash
-sudo ovs-vsctl show
-sudo ovs-ofctl dump-flows br-lab
-sudo ovs-appctl fdb/show br-lab
-sudo ip netns exec h1 ip neigh
+sudo ovs-vsctl show                 # configuration du commutateur : ses ponts et ses ports
+sudo ovs-ofctl dump-flows br-lab    # règles OpenFlow du commutateur (ici une seule : NORMAL)
+sudo ovs-appctl fdb/show br-lab     # table d'apprentissage : quelle adresse MAC sur quel port
+sudo ip netns exec h1 ip neigh      # table ARP de h1 : les voisins (IP ↔ MAC) qu'il a vus
 ```
 
 Questions :
@@ -66,11 +66,11 @@ Questions :
 **Bonus : un conteneur est un namespace comme les autres.**
 
 ```bash
-sudo docker run -d --name web alpine:3.20 sleep 3600
-PID=$(sudo docker inspect -f '{{.State.Pid}}' web)
-sudo nsenter -t "$PID" -n ip addr
-bridge link | grep docker0
-sudo docker rm -f web
+sudo docker run -d --name web alpine:3.20 sleep 3600   # lance un conteneur qui tourne en fond
+PID=$(sudo docker inspect -f '{{.State.Pid}}' web)     # récupère le PID du conteneur sur l'hôte
+sudo nsenter -t "$PID" -n ip addr                      # entre dans le namespace réseau du conteneur et liste ses interfaces
+bridge link | grep docker0                             # montre le câble veth du conteneur, branché sur le pont docker0
+sudo docker rm -f web                                  # supprime le conteneur
 ```
 
 Livrable : `tp1a.sh` rejouable, commité.

@@ -7,24 +7,24 @@ Décrire la connectivité des zones dans un fichier YAML versionné et l'appliqu
 `politique.yaml` :
 
 ```yaml
-autorisations:
+autorisations:                    # chaque entrée = une connexion autorisée (traduite en intention hôte-à-hôte)
   - nom: dev-vers-recette
-    de: "00:00:00:00:00:01"
-    vers: "00:00:00:00:00:02"
+    de: "00:00:00:00:00:01"       # MAC de h1 (dev)
+    vers: "00:00:00:00:00:02"     # MAC de h2 (recette)
   - nom: admin-vers-recette
-    de: "00:00:00:00:00:04"
-    vers: "00:00:00:00:00:02"
+    de: "00:00:00:00:00:04"       # h4 (admin)
+    vers: "00:00:00:00:00:02"     # h2 (recette)
   - nom: admin-vers-prod
-    de: "00:00:00:00:00:04"
-    vers: "00:00:00:00:00:03"
+    de: "00:00:00:00:00:04"       # h4 (admin)
+    vers: "00:00:00:00:00:03"     # h3 (prod)
 ```
 
 1. Retirez les intentions du TP3-B : listez-les, puis supprimez-les par clé.
 
 ```bash
-curl -s -u onos:rocks http://localhost:8181/onos/v1/intents \
-  | jq -r '.intents[] | "\(.appId) \(.key) \(.state)"'
-curl -s -u onos:rocks -X DELETE http://localhost:8181/onos/v1/intents/org.onosproject.cli/<clé>
+curl -s -u onos:rocks http://localhost:8181/onos/v1/intents \                 # liste les intentions existantes...
+  | jq -r '.intents[] | "\(.appId) \(.key) \(.state)"'                        # ...avec leur application, leur clé et leur état
+curl -s -u onos:rocks -X DELETE http://localhost:8181/onos/v1/intents/org.onosproject.cli/<clé>   # en supprime une par sa clé
 ```
 
 2. Appliquez la politique : `python3 apply_policy.py politique.yaml`.

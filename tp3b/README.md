@@ -5,30 +5,30 @@
 Remplacer l'acheminement automatique par une politique explicite, puis constater que le contrôleur la maintient pendant une panne.
 
 ```text
-onos> app deactivate org.onosproject.fwd
-mininet> pingall
-onos> add-host-intent 00:00:00:00:00:01/None 00:00:00:00:00:03/None
-onos> intents
-mininet> h1 ping -c 3 h3
-mininet> h1 ping -c 3 h2
-onos> paths of:0000000000000001 of:0000000000000003
+onos> app deactivate org.onosproject.fwd                              # coupe le routage automatique : plus rien n'est acheminé
+mininet> pingall                                                     # tout échoue désormais (aucune règle posée)
+onos> add-host-intent 00:00:00:00:00:01/None 00:00:00:00:00:03/None  # déclare l'intention « h1 doit joindre h3 »
+onos> intents                                                        # liste les intentions et leur état (INSTALLED)
+mininet> h1 ping -c 3 h3                                             # h1 -> h3 : passe grâce à l'intention
+mininet> h1 ping -c 3 h2                                             # h1 -> h2 : échoue, aucune intention pour cette paire
+onos> paths of:0000000000000001 of:0000000000000003                 # chemins calculés par ONOS entre s1 et s3
 ```
 
 Provoquer des pannes :
 
 ```text
-mininet> link s1 s2 down
-mininet> h1 ping -c 3 h3
-mininet> link s1 s4 down
-onos> intents
-mininet> link s1 s4 up
-mininet> h1 ping -c 3 h3
+mininet> link s1 s2 down     # coupe un lien de l'anneau
+mininet> h1 ping -c 3 h3     # passe encore : ONOS a recalculé par l'autre côté
+mininet> link s1 s4 down     # coupe le second chemin : s1 est isolé
+onos> intents                # l'intention passe à FAILED (plus aucun chemin possible)
+mininet> link s1 s4 up       # on rétablit un lien
+mininet> h1 ping -c 3 h3     # repasse : l'intention est réinstallée toute seule
 ```
 
 La même intention par l'API nord :
 
 ```bash
-curl -s -u onos:rocks -X POST -H 'Content-Type: application/json' \
+curl -s -u onos:rocks -X POST -H 'Content-Type: application/json' \   # même intention, mais par l'API REST : h2 <-> h4
   http://localhost:8181/onos/v1/intents -d '{
     "type": "HostToHostIntent", "appId": "org.onosproject.cli", "priority": 100,
     "one": "00:00:00:00:00:02/None", "two": "00:00:00:00:00:04/None"}'
