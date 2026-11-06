@@ -276,23 +276,9 @@ fi
 if [[ -n "$UNDERLAY_IF" ]]; then configurer_underlay; fi
 controler
 
-if [[ $SECONDAIRE -eq 1 ]]; then
-  cat <<EOF
-
-Étapes suivantes (lab-b) :
-  1. Notez l'adresse LAN de cette machine : ip -br a
-  2. Sur lab-a : cd ~/lab && sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
-  3. Prenez un instantané « etat-initial ».
-EOF
+if [[ $KO -eq 0 ]]; then
+  printf '\nInstallation terminée : tout est prêt.\n'
 else
-  cat <<EOF
-
-Étapes suivantes (lab-a) :
-  1. Les TP utilisent « sudo docker », pas besoin de redémarrer.
-  2. Pour l'interface d'ONOS, ouvrez le Firefox de la machine sur http://localhost:8181/onos/ui (onos / rocks).
-  3. Préparez lab-b (même LAN) : cd ~/lab && sudo bash infra/preparation_vm.sh --secondaire
-  4. Vérifiez le lien et la MTU : cd ~/lab && sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
-  5. Prenez un instantané « outils installés » des deux machines avant de dérouler les TP.
-EOF
+  printf '\n%d contrôle(s) en échec ci-dessus, à corriger avant les TP.\n' "$KO"
 fi
 [[ $KO -eq 0 ]]
