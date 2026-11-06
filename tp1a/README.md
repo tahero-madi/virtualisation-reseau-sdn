@@ -2,6 +2,20 @@
 
 **Jour 1, 09:40 · 45 min.** Objectif : construire un réseau virtuel isolé sur un hôte Linux, en une dizaine de commandes. Support : chapitres 3 et 4.
 
+## Installation des outils (une seule fois, pour les deux jours)
+
+Votre machine lab-a est un Ubuntu 24.04 vierge : le bureau et Firefox, mais aucun outil réseau. On les installe maintenant. Dans un **premier terminal** :
+
+```bash
+sudo apt-get update && sudo apt-get install -y git
+git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
+sudo bash ~/lab/infra/preparation_vm.sh --kit ~/lab --sans-bureau
+```
+
+Le script installe d'abord Open vSwitch (quelques minutes), puis continue à télécharger l'image ONOS et os-ken, dont vous aurez besoin au jour 2. **Dès que s'affiche `[ OK ] Open vSwitch répond`, ouvrez un second terminal et commencez le TP ci-dessous** ; laissez le premier terminal finir le téléchargement. À la fin, quand le script affiche son bilan, prenez un **instantané « outils installés »** : en cas de problème, vous y reviendrez plutôt qu'à la machine vierge.
+
+## L'exercice
+
 Relier deux machines isolées, h1 et h2 (zone dev), par un commutateur Open vSwitch, puis observer ce que fait le commutateur.
 
 ```bash

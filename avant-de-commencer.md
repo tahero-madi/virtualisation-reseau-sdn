@@ -11,26 +11,7 @@ Chaque stagiaire dispose de deux machines Ubuntu 24.04 LTS, sur un LAN qui n'app
 | Réseau | Accès par la plateforme Hexceos (bureau distant, terminal SSH, console de secours) ; pour le TP2-B, lab-a et lab-b sur le même LAN, UDP 4789 autorisé entre les deux |
 | Navigateur | Firefox, sur lab-a elle-même : l'interface web d'ONOS s'ouvre à l'adresse `http://localhost:8181/onos/ui` |
 
-**Installation des logiciels**, déjà faite sur les machines de la formation. Pour refaire le lab chez vous, le script complet [`infra/preparation_vm.sh`](infra/preparation_vm.sh) installe et contrôle les deux machines (voir le [README](README.md)). La version minimale ci-dessous, [`infra/preparation_lab.sh`](infra/preparation_lab.sh), suffit sur une seule machine :
-
-```bash
-#!/usr/bin/env bash
-# preparation_lab.sh
-set -euo pipefail
-export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update
-sudo apt-get install -y openvswitch-switch mininet iproute2 nftables tcpdump tshark \
-  iperf iperf3 curl jq git python3-venv python3-yaml python3-requests docker.io
-sudo usermod -aG docker "$USER"
-sudo docker pull onosproject/onos:2.7.0
-sudo docker pull alpine:3.20
-python3 -m venv ~/osken && ~/osken/bin/pip install os-ken pyyaml requests
-
-# Contrôles
-sudo ovs-vsctl --version | head -1
-sudo mn --switch ovsbr --controller none --test pingall
-~/osken/bin/python -c "import os_ken; print('os-ken OK')"
-```
+**Les machines arrivent vierges.** lab-a et lab-b sont des Ubuntu 24.04 avec seulement le bureau et Firefox ; aucun outil réseau n'est préinstallé. Vous installez les outils vous-même, une fois pour les deux jours : sur lab-a au début du [TP1-A](tp1a/README.md), sur lab-b au début du [TP2-B](tp2b/README.md). Le script [`infra/preparation_vm.sh`](infra/preparation_vm.sh) s'en charge, et un instantané pris juste après vous évite de tout réinstaller en cas de pépin. Pour refaire le lab chez vous, c'est la même installation : voir le [README](README.md).
 
 **Habitudes à prendre.**
 

@@ -4,6 +4,14 @@
 
 Relier deux « VM » hébergées sur deux hyperviseurs dans un même segment de niveau 2, au-dessus d'un réseau IP. Ici, les deux hyperviseurs sont vos machines lab-a et lab-b, et le réseau IP est le LAN de votre environnement.
 
+**Préparer lab-b.** lab-b est aussi un Ubuntu 24.04 vierge. Installez-y les outils réseau — rapide, sans image ONOS :
+
+```bash
+sudo apt-get update && sudo apt-get install -y git
+git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
+sudo bash ~/lab/infra/preparation_vm.sh --secondaire
+```
+
 **Sur vos deux machines (Open vSwitch).** Relevez d'abord l'adresse LAN de chacune avec `ip -br a`. Prenez un instantané de lab-a et de lab-b. Lancez le bloc sur lab-a, puis sur lab-b en inversant `LOCAL` et `REMOTE` et en changeant la ligne `MOI` (`vmB`, 172.16.10.2) :
 
 ```bash

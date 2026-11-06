@@ -16,7 +16,7 @@ Cherchez d'abord par vous-même : le corrigé sert à vous débloquer, ou à vé
 
 ## Récupérer les fichiers sur lab-a
 
-Sur les machines de la formation, tout est déjà installé et les scripts sont dans `~/lab`. Pour cloner le dépôt sur votre propre machine :
+Les machines arrivent vierges (Ubuntu 24.04, bureau et Firefox). L'installation des outils, au début du [TP1-A](tp1a/README.md) sur lab-a et du [TP2-B](tp2b/README.md) sur lab-b, clone d'abord ce dépôt dans `~/lab` :
 
 ```bash
 sudo apt-get update -q && sudo apt-get install -y git
@@ -67,7 +67,7 @@ Les TP se font sur **lab-a** ; **lab-b** ne sert qu'au TP2-B, comme second hyper
 
 | Machine | Rôle | Ressources | Système |
 | --- | --- | --- | --- |
-| lab-a | Tous les TP : Open vSwitch, Mininet, Docker et ONOS 2.7.0, os-ken, bureau XFCE et Firefox | 4 vCPU, 8 Go de RAM, 40 Go | Ubuntu 24.04 LTS |
+| lab-a | Tous les TP : Open vSwitch, Mininet, Docker et ONOS 2.7.0, os-ken (installés au TP1-A). Bureau et Firefox fournis par la machine | 4 vCPU, 8 Go de RAM, 40 Go | Ubuntu 24.04 LTS |
 | lab-b | Second hyperviseur du TP2-B : Open vSwitch et outils réseau | 2 vCPU, 2 Go de RAM, 20 Go | Ubuntu 24.04 LTS Server |
 
 Pour refaire le lab chez vous, sur deux VM KVM, VMware ou VirtualBox (pas de conteneurs LXC : les TP chargent des modules noyau) :
