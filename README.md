@@ -72,16 +72,21 @@ Les TP se font sur **lab-a** ; **lab-b** ne sert qu'au TP2-B, comme second hyper
 
 Pour refaire le lab chez vous, sur deux VM KVM, VMware ou VirtualBox (pas de conteneurs LXC : les TP chargent des modules noyau) :
 
+On se place dans `~/lab` puis on lance avec un chemin relatif : sous `sudo`, un `~` pointerait vers `/root`, pas vers votre dossier.
+
 ```bash
 # Sur lab-a
 git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
-sudo bash ~/lab/infra/preparation_vm.sh --kit ~/lab    # installe tout, rassemble les scripts dans ~/lab
+cd ~/lab
+sudo bash infra/preparation_vm.sh --kit "$PWD"    # installe tout, rassemble les scripts dans ~/lab
 
 # Sur lab-b
-sudo bash ~/lab/infra/preparation_vm.sh --secondaire   # installation légère
+git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
+cd ~/lab
+sudo bash infra/preparation_vm.sh --secondaire    # installation légère
 
 # Sur lab-a, une fois lab-b prête : ping et MTU 1 500 entre les deux machines
-sudo bash ~/lab/infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
+cd ~/lab && sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
 ```
 
 `sudo bash infra/preparation_vm.sh --help` détaille les options (`--sans-bureau`, `--test-onos`, `--underlay`). Avec une seule machine, le TP2-B se fait en « variante seule », deux namespaces jouant les hyperviseurs. L'interface web d'ONOS s'ouvre dans le Firefox de lab-a : `http://localhost:8181/onos/ui` (onos / rocks).

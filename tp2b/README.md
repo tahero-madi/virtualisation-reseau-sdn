@@ -9,7 +9,8 @@ Relier deux « VM » hébergées sur deux hyperviseurs dans un même segment de 
 ```bash
 sudo apt-get update && sudo apt-get install -y git
 git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
-sudo bash ~/lab/infra/preparation_vm.sh --secondaire
+cd ~/lab
+sudo bash infra/preparation_vm.sh --secondaire
 ```
 
 **Sur vos deux machines (Open vSwitch).** Relevez d'abord l'adresse LAN de chacune avec `ip -br a`. Prenez un instantané de lab-a et de lab-b. Lancez le bloc sur lab-a, puis sur lab-b en inversant `LOCAL` et `REMOTE` et en changeant la ligne `MOI` (`vmB`, 172.16.10.2) :

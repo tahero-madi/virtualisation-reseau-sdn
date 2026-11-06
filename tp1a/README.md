@@ -9,10 +9,11 @@ Votre machine lab-a est un Ubuntu 24.04 vierge : le bureau et Firefox, mais aucu
 ```bash
 sudo apt-get update && sudo apt-get install -y git
 git clone https://github.com/tahero-madi/virtualisation-reseau-sdn.git ~/lab
-sudo bash ~/lab/infra/preparation_vm.sh --kit ~/lab --sans-bureau
+cd ~/lab
+sudo bash infra/preparation_vm.sh --kit "$PWD" --sans-bureau
 ```
 
-Le script installe d'abord Open vSwitch (quelques minutes), puis continue à télécharger l'image ONOS et os-ken, dont vous aurez besoin au jour 2. **Dès que s'affiche `[ OK ] Open vSwitch répond`, ouvrez un second terminal et commencez le TP ci-dessous** ; laissez le premier terminal finir le téléchargement. À la fin, quand le script affiche son bilan, prenez un **instantané « outils installés »** : en cas de problème, vous y reviendrez plutôt qu'à la machine vierge.
+On se place dans `~/lab` puis on lance avec un chemin relatif : sous `sudo`, un `~` pointerait vers `/root`, pas vers votre dossier. Le script installe d'abord Open vSwitch (quelques minutes), puis continue à télécharger l'image ONOS et os-ken, dont vous aurez besoin au jour 2. **Dès que s'affiche `[ OK ] Open vSwitch répond`, ouvrez un second terminal et commencez le TP ci-dessous** ; laissez le premier terminal finir le téléchargement. À la fin, quand le script affiche son bilan, prenez un **instantané « outils installés »** : en cas de problème, vous y reviendrez plutôt qu'à la machine vierge.
 
 ## L'exercice
 

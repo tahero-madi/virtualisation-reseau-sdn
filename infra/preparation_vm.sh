@@ -2,9 +2,10 @@
 # preparation_vm.sh — prépare les machines des TP de la formation 1-041
 # Cible : Ubuntu 24.04 LTS (Server, installation minimale + OpenSSH), VM KVM (Proxmox), VMware ou VirtualBox.
 #
-# Deux machines par stagiaire, sur le même LAN :
-#   lab-a  machine de TP complète : sudo bash preparation_vm.sh --kit kit_tp_1-041.zip
-#   lab-b  second hyperviseur du TP2-B (VXLAN), installation légère : sudo bash preparation_vm.sh --secondaire
+# Deux machines par stagiaire, sur le même LAN. Lancez-le toujours depuis le dépôt, en chemin
+# relatif — jamais « sudo bash ~/lab/... » : sous sudo, ~ pointe vers /root, pas vers votre dossier.
+#   lab-a  machine de TP complète : cd ~/lab && sudo bash infra/preparation_vm.sh --kit "$PWD"
+#   lab-b  second hyperviseur du TP2-B (VXLAN), légère : cd ~/lab && sudo bash infra/preparation_vm.sh --secondaire
 #
 # Options :
 #   --secondaire                 lab-b : Open vSwitch et outils réseau seulement (ni bureau, ni Docker, ni ONOS, ni os-ken)
@@ -269,18 +270,18 @@ if [[ $SECONDAIRE -eq 1 ]]; then
 
 Étapes suivantes (lab-b) :
   1. Notez l'adresse LAN de cette machine : ip -br a
-  2. Sur lab-a, vérifiez le lien et la MTU : sudo bash preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
+  2. Sur lab-a : cd ~/lab && sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
   3. Prenez un instantané « etat-initial ».
 EOF
 else
   cat <<EOF
 
 Étapes suivantes (lab-a) :
-  1. Redémarrez la machine (groupe docker, bureau) : sudo reboot
-  2. Testez le bureau : client RDP (Remmina, mstsc) ou « Bureau distant » de la plateforme, compte $CIBLE, session Xorg.
-  3. Préparez lab-b : Ubuntu Server 24.04 sur le même LAN, puis sudo bash preparation_vm.sh --secondaire
-  4. Vérifiez le lien et la MTU : sudo bash preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
-  5. Prenez un instantané « etat-initial » des deux machines avant de dérouler les TP.
+  1. Les TP utilisent « sudo docker », pas besoin de redémarrer.
+  2. Pour l'interface d'ONOS, ouvrez le Firefox de la machine sur http://localhost:8181/onos/ui (onos / rocks).
+  3. Préparez lab-b (même LAN) : cd ~/lab && sudo bash infra/preparation_vm.sh --secondaire
+  4. Vérifiez le lien et la MTU : cd ~/lab && sudo bash infra/preparation_vm.sh --verifier-seulement --pair <adresse de lab-b>
+  5. Prenez un instantané « outils installés » des deux machines avant de dérouler les TP.
 EOF
 fi
 [[ $KO -eq 0 ]]
