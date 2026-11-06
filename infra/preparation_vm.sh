@@ -166,10 +166,14 @@ installer_kit() {
 OK=0 KO=0
 controle() {  # controle "libellé" commande...
   local lib="$1"; shift
-  if "$@" > /tmp/lab-controle.log 2>&1; then
+  local out
+  # On capture la sortie dans une variable, pas dans un fichier : « mn -c » efface /tmp/*.log.
+  if out="$("$@" 2>&1)"; then
     printf '  [ OK ] %s\n' "$lib"; OK=$((OK + 1))
   else
-    printf '  [ÉCHEC] %s\n' "$lib"; sed 's/^/         /' /tmp/lab-controle.log | tail -5; KO=$((KO + 1))
+    printf '  [ÉCHEC] %s\n' "$lib"
+    printf '%s\n' "$out" | tail -8 | sed 's/^/         /'
+    KO=$((KO + 1))
   fi
 }
 
@@ -186,12 +190,19 @@ test_vxlan_namespaces() {
 }
 
 test_mininet() {
-  local rc
+  local out=""
   mn -c > /dev/null 2>&1 || true
-  timeout 120 mn --switch ovsbr --controller none --test pingall 2>&1 | grep -q " 0% dropped"
-  rc=$?
+  # Le premier passage perd parfois quelques paquets, le temps d'apprendre les adresses MAC : on réessaie.
+  for _ in 1 2 3; do
+    out="$(timeout 120 mn --switch ovsbr --controller none --test pingall 2>&1)" || true
+    if printf '%s\n' "$out" | grep -q " 0% dropped"; then
+      mn -c > /dev/null 2>&1 || true
+      return 0
+    fi
+  done
+  printf '%s\n' "$out"   # dernière sortie, pour diagnostic en cas d'échec
   mn -c > /dev/null 2>&1 || true
-  return $rc
+  return 1
 }
 
 test_firefox() {  # le .deb de Mozilla, pas le paquet de transition vers le snap
