@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# verif_routeur.sh — vérifie le routeur sur un bâton du TP2-A.
+# verif_routeur.sh — vérifie le routeur (router on a stick) du TP2-A.
 # À lancer avec : sudo bash verif_routeur.sh
 
 ok=0; ko=0

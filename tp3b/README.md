@@ -11,7 +11,7 @@ Les commandes `onos>` se tapent dans la **CLI d'ONOS**, qu'on ouvre de deux faç
 - **En SSH** (recommandé), depuis un terminal de lab-a :
 
   ```bash
-  ssh -p 8101 onos@localhost      # mot de passe : rocks
+  ssh -p 8101 -o HostKeyAlgorithms=+ssh-rsa onos@127.0.0.1    # mot de passe : rocks
   ```
 
 - **Par l'interface web** : `http://localhost:8181/onos/ui`, menu, section *« Application / CLI »* — la même console, dans le navigateur.

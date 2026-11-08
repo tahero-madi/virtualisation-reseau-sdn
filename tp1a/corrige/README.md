@@ -2,6 +2,23 @@
 
 > Cherchez d'abord par vous-même : ce corrigé sert à vous débloquer, ou à vérifier votre travail à la fin du TP.
 
+## Construire h2 (étape 3)
+
+Les mêmes gestes que pour h1, en remplaçant `h1` par `h2` et l'adresse par `10.10.10.2/24` :
+
+```bash
+sudo ip netns add h2
+sudo ip link add h2-eth0 type veth peer name h2-port
+sudo ip link set h2-eth0 netns h2
+sudo ovs-vsctl add-port br-lab h2-port
+sudo ip link set h2-port up
+sudo ip -n h2 link set lo up
+sudo ip -n h2 link set h2-eth0 up
+sudo ip -n h2 addr add 10.10.10.2/24 dev h2-eth0
+```
+
+Vérification : `sudo ip netns exec h1 ping -c 2 10.10.10.2` doit passer (0 % de perte).
+
 ## Questions
 
 **1. Pourquoi `ip a` exécuté dans h1 ne montre-t-il pas les interfaces de l'hôte ?**

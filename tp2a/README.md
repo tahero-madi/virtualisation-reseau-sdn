@@ -69,7 +69,7 @@ sudo ip netns exec dev1 ping -c 2 10.10.20.11   # dev1 -> rec1 (autre VLAN) : é
 - Premier ping : dev1 et dev2 sont dans le même VLAN 10, la communication passe.
 - Second ping : rec1 est dans le VLAN 20, un autre segment ; sans routeur, rien ne passe. **Les VLAN isolent.**
 
-### Étape 3 — Le routeur sur un bâton
+### Étape 3 — Le routeur (router on a stick)
 
 On crée le routeur et on active le routage **avant** d'ajouter les sous-interfaces, puis on fait ensemble la sous-interface du VLAN 10 :
 
@@ -158,7 +158,16 @@ sudo ovsdb-client monitor Open_vSwitch Port name tag   # s'abonne aux changement
 
 **Ligne par ligne.**
 
-- `ovsdb-client list-tables` : liste les tables de la base de configuration d'Open vSwitch (OVSDB, RFC 7047). Les principales : **`Open_vSwitch`** (la racine), **`Bridge`** (les ponts comme `br-vlan`), **`Port`** (les ports et leur VLAN d'accès `tag` ou de `trunks`), **`Interface`** (les interfaces physiques ou virtuelles sous chaque port), **`Controller`** (les contrôleurs OpenFlow, utilisés au jour 2). Toute la configuration que vous voyez avec `ovs-vsctl show` est rangée dans ces tables.
+- `ovsdb-client list-tables` : liste les tables de la base de configuration d'Open vSwitch (OVSDB, RFC 7047). Toute la configuration que montre `ovs-vsctl show` est rangée dans ces tables ; les principales :
+
+| Table | Contenu |
+| --- | --- |
+| `Open_vSwitch` | la racine de la configuration |
+| `Bridge` | les ponts, comme `br-vlan` |
+| `Port` | les ports, avec leur VLAN d'accès (`tag`) ou de trunk (`trunks`) |
+| `Interface` | les interfaces (physiques ou virtuelles) sous chaque port |
+| `Controller` | les contrôleurs OpenFlow (utilisés au jour 2) |
+
 - `ovs-vsctl --columns=name,tag,trunks list Port` : affiche, pour chaque port, son nom, son VLAN d'accès (`tag`) ou ses VLAN de trunk (`trunks`) — c'est la lecture directe de la table `Port`.
 - `ovsdb-client monitor Open_vSwitch Port name tag` : s'abonne aux changements de la table `Port` en direct ; ajoutez un port dans un autre terminal pour voir l'événement apparaître.
 

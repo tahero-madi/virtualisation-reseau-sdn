@@ -76,7 +76,7 @@ Dans le Firefox de lab-a, ouvrez `http://localhost:8181/onos/ui` (identifiants *
 ### Étape 3 — Explorer par la CLI et l'API
 
 ```bash
-ssh -p 8101 onos@localhost      # mot de passe : rocks
+ssh -p 8101 -o HostKeyAlgorithms=+ssh-rsa onos@127.0.0.1    # mot de passe : rocks
 ```
 
 Dans la CLI ONOS : `apps -a -s` (applications actives), `devices`, `links`, `hosts`, `flows -s`.
@@ -92,7 +92,7 @@ curl -s -u $AUTH $API/hosts   | jq -c '.hosts[] | {mac, ipAddresses}'
 
 **Ligne par ligne.**
 
-- `ssh -p 8101 onos@localhost` : ouvre la ligne de commande d'ONOS (Apache Karaf), sur le port 8101.
+- `ssh -p 8101 -o HostKeyAlgorithms=+ssh-rsa onos@127.0.0.1` : ouvre la ligne de commande d'ONOS (Apache Karaf), sur le port 8101. L'option `-o HostKeyAlgorithms=+ssh-rsa` est nécessaire car ONOS présente une clé d'hôte RSA, refusée par défaut par les clients SSH récents.
 - `apps -a -s` : liste les applications **a**ctives, format court (**s**).
 - `devices` / `links` / `hosts` / `flows -s` : les switches, les liens, les hôtes, les flux installés.
 - côté API : `/devices` liste les switches vus par ONOS, `/links | length` compte les liens découverts, `/hosts` donne les hôtes appris (MAC et IP). `jq` met la réponse JSON en forme.
