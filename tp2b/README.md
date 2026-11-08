@@ -2,7 +2,14 @@
 
 **Jour 1, 14:45 · 65 min · sur lab-a et lab-b.** Objectif : étendre un segment de niveau 2 entre deux hyperviseurs par un overlay VXLAN. Support : chapitres 5 à 8.
 
-Relier deux « VM » hébergées sur deux hyperviseurs dans un même segment de niveau 2, au-dessus d'un réseau IP. Ici, les deux hyperviseurs sont vos machines lab-a et lab-b, et le réseau IP est le LAN de votre environnement.
+Relier deux « VM » hébergées sur deux hyperviseurs dans un même segment de niveau 2, au-dessus d'un réseau IP. Ici, les deux hyperviseurs sont vos machines lab-a et lab-b, et le réseau IP (l'**underlay**) est le LAN de votre environnement.
+
+```mermaid
+graph LR
+  vmA["vmA · 172.16.10.1"] --- brA["br-ovl<br/>(lab-a)"]
+  brA ===|"tunnel VXLAN · VNI 5010 · UDP 4789"| brB["br-ovl<br/>(lab-b)"]
+  vmB["vmB · 172.16.10.2"] --- brB
+```
 
 **Préparer lab-b.** lab-b est aussi un Ubuntu 24.04 vierge. Installez-y les outils réseau — rapide, sans image ONOS :
 
@@ -13,63 +20,79 @@ cd ~/lab
 sudo bash infra/preparation_vm.sh --secondaire
 ```
 
-**Sur vos deux machines (Open vSwitch).** Relevez d'abord l'adresse LAN de chacune avec `ip -br a`. Prenez un instantané de lab-a et de lab-b. Lancez le bloc sur lab-a, puis sur lab-b en inversant `LOCAL` et `REMOTE` et en changeant la ligne `MOI` (`vmB`, 172.16.10.2) :
+Relevez l'adresse LAN de chaque machine avec `ip -br a`, et prenez un instantané de lab-a et de lab-b.
+
+### Étape 1 — Sur lab-a (guidé)
 
 ```bash
-LOCAL=10.10.0.11; REMOTE=10.10.0.12      # adresse LAN de cette machine, puis de l'autre (ip -br a)
+LOCAL=10.10.0.11; REMOTE=10.10.0.12      # adresse LAN de CETTE machine, puis de l'AUTRE (ip -br a)
 IF=$(ip -o route get $REMOTE | grep -oP '(?<=dev )\S+'); echo "interface du LAN : $IF"
-MOI=vmA; IP=172.16.10.1; AUTRE=172.16.10.2   # sur lab-b : MOI=vmB; IP=172.16.10.2; AUTRE=172.16.10.1
+MOI=vmA; IP=172.16.10.1; AUTRE=172.16.10.2
 
-sudo ovs-vsctl add-br br-ovl                                          # commutateur local de l'overlay
+sudo ovs-vsctl add-br br-ovl
 sudo ovs-vsctl add-port br-ovl vx5010 -- set interface vx5010 type=vxlan \
-     options:local_ip=$LOCAL options:remote_ip=$REMOTE options:key=5010   # tunnel VXLAN vers l'autre machine, VNI 5010
-sudo ip netns add $MOI                                               # une « VM » (namespace) sur cet hyperviseur
-sudo ip link add $MOI-eth0 type veth peer name $MOI-p                # son câble
+     options:local_ip=$LOCAL options:remote_ip=$REMOTE options:key=5010
+sudo ip netns add $MOI
+sudo ip link add $MOI-eth0 type veth peer name $MOI-port
 sudo ip link set $MOI-eth0 netns $MOI
-sudo ovs-vsctl add-port br-ovl $MOI-p && sudo ip link set $MOI-p up  # branchée sur le commutateur de l'overlay
-sudo ip -n $MOI addr add $IP/24 dev $MOI-eth0                        # adresse dans 172.16.10.0/24 (le segment overlay)
+sudo ovs-vsctl add-port br-ovl $MOI-port && sudo ip link set $MOI-port up
+sudo ip -n $MOI addr add $IP/24 dev $MOI-eth0
 sudo ip -n $MOI link set $MOI-eth0 up
-
-sudo ip netns exec $MOI ping -c 3 $AUTRE                             # ping l'autre VM : le trafic passe par le tunnel
-sudo tcpdump -n -i $IF -c 4 udp port 4789                            # sur le LAN, les paquets VXLAN encapsulés (UDP 4789)
-sudo tshark -i $IF -f 'udp port 4789' -c 2 -V | grep -A 4 'Virtual eXtensible'   # on y lit le VNI 5010
 ```
 
-**Variante seule (VXLAN natif Linux), si lab-b n'est pas disponible.** Sur lab-a, deux namespaces jouent les hyperviseurs :
+**Ligne par ligne.**
+
+- `LOCAL=… ; REMOTE=…` : l'adresse LAN de cette machine, puis de l'autre (relevées avec `ip -br a`).
+- `IF=$(ip -o route get $REMOTE | …)` : trouve automatiquement l'interface du LAN par laquelle on joint l'autre machine, et l'affiche.
+- `MOI=vmA; IP=172.16.10.1; AUTRE=172.16.10.2` : le nom de la VM locale, son adresse dans le segment overlay, et l'adresse de la VM d'en face.
+- `ovs-vsctl add-br br-ovl` : le commutateur local de l'overlay.
+- `add-port br-ovl vx5010 … type=vxlan options:…` : crée le **tunnel VXLAN** vers l'autre machine — `local_ip`/`remote_ip` sont les extrémités (les VTEP), `key=5010` est le **VNI** (l'identifiant du segment).
+- les lignes `ip netns add`, `ip link add`, `add-port` : créent la « VM » vmA et la branchent sur le commutateur de l'overlay.
+- `ip -n $MOI addr add $IP/24 dev $MOI-eth0` : adresse de la VM dans `172.16.10.0/24`, le segment overlay.
+
+### Étape 2 — Sur lab-b (à vous d'écrire les commandes)
+
+Cette fois, **vous reconstruisez vous-mêmes** le même montage sur lab-b, en repartant du modèle de lab-a. C'est l'intérêt de l'exercice : écrire les commandes, pas les copier. Cible à atteindre sur lab-b :
+
+| Élément | Valeur sur lab-b |
+| --- | --- |
+| `LOCAL` / `REMOTE` | l'inverse de lab-a : LAN de lab-b, puis LAN de lab-a |
+| Nom de la VM (`MOI`) | `vmB` |
+| Adresse de la VM (`IP`) | 172.16.10.2 |
+| VM d'en face (`AUTRE`) | 172.16.10.1 |
+| Commutateur | `br-ovl` |
+| Port VXLAN | `vx5010`, VNI `key=5010` |
+| Interfaces | `vmB-eth0` (côté VM), `vmB-port` (côté commutateur) |
+
+Adaptez les trois premières lignes de l'étape 1 à ces valeurs, puis rejouez le reste du bloc tel quel (il est déjà écrit avec les variables `$MOI`, `$IP`…).
+
+### Étape 3 — Test et capture
+
+Une fois les deux côtés montés, depuis lab-a :
 
 ```bash
-sudo ip netns add hv1; sudo ip netns add hv2        # deux hyperviseurs simulés
-sudo ip link add u1 type veth peer name u2          # le « réseau physique » (underlay) entre eux
-sudo ip link set u1 netns hv1; sudo ip link set u2 netns hv2
-sudo ip -n hv1 addr add 192.168.100.1/24 dev u1; sudo ip -n hv1 link set u1 up   # adresse underlay de hv1
-sudo ip -n hv2 addr add 192.168.100.2/24 dev u2; sudo ip -n hv2 link set u2 up   # adresse underlay de hv2
-
-for i in 1 2; do
-  peer=$((3 - i))                                   # l'autre hyperviseur (1->2, 2->1)
-  sudo ip -n hv$i link add vx5010 type vxlan id 5010 dstport 4789 \
-       local 192.168.100.$i remote 192.168.100.$peer dev u$i   # interface VXLAN (VNI 5010) vers l'autre
-  sudo ip -n hv$i link add br0 type bridge          # pont local
-  sudo ip -n hv$i link set vx5010 master br0        # le VXLAN devient un port du pont
-  sudo ip netns add vm$i                            # la « VM » hébergée
-  sudo ip link add vm$i-eth0 type veth peer name tap$i
-  sudo ip link set vm$i-eth0 netns vm$i
-  sudo ip link set tap$i netns hv$i
-  sudo ip -n hv$i link set tap$i master br0         # la VM est raccordée au pont, donc au tunnel
-  for d in vx5010 br0 tap$i; do sudo ip -n hv$i link set $d up; done
-  sudo ip -n vm$i addr add 172.16.10.$i/24 dev vm$i-eth0   # adresse de la VM dans le segment overlay
-  sudo ip -n vm$i link set vm$i-eth0 up
-done
-
-sudo ip netns exec vm1 ping -c 3 172.16.10.2         # vm1 ping vm2 à travers le tunnel
-sudo ip netns exec hv1 tcpdump -n -i u1 -c 4 udp port 4789   # sur l'underlay, les paquets VXLAN
+sudo ip netns exec $MOI ping -c 3 $AUTRE
+sudo tcpdump -n -i $IF -c 4 udp port 4789
+sudo tshark -i $IF -f 'udp port 4789' -c 2 -V | grep -A 4 'Virtual eXtensible'
 ```
 
-**L'expérience MTU**, sur lab-a (variante seule : `vm1` au lieu de `vmA`) :
+**Ligne par ligne.**
+
+- `ip netns exec $MOI ping -c 3 $AUTRE` : vmA pingue vmB ; le trafic passe par le tunnel, alors que lab-a et lab-b ne partagent qu'un réseau IP.
+- `tcpdump -n -i $IF -c 4 udp port 4789` : sur le LAN (l'underlay), on voit les paquets VXLAN **encapsulés** — UDP, port 4789.
+- `tshark … -V | grep -A 4 'Virtual eXtensible'` : ouvre l'en-tête VXLAN d'un paquet et on y lit le **VNI 5010**.
+
+### Étape 4 — L'expérience MTU
 
 ```bash
 sudo ip netns exec vmA ping -c 2 -M do -s 1422 172.16.10.2   # 1422 + 28 (IP/ICMP) + 50 (VXLAN) = 1500 : passe tout juste
 sudo ip netns exec vmA ping -c 2 -M do -s 1472 172.16.10.2   # 1472 + 28 + 50 = 1550 > 1500 : échoue (-M do interdit de fragmenter)
 ```
+
+**Ligne par ligne.**
+
+- premier ping : charge utile 1422 octets ; avec 28 d'en-têtes IP/ICMP et 50 de VXLAN, on atteint 1500 — ça passe tout juste.
+- second ping : 1472 octets mènent à 1550, au-delà du MTU de 1500 de l'underlay ; `-M do` interdit la fragmentation, donc le paquet est perdu. C'est le symptôme classique « le ping passe, le transfert bloque ».
 
 Questions :
 

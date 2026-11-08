@@ -25,7 +25,7 @@ $OF replace-flows s1 regles_solution.txt
 
 - **Le groupe `all`** est la façon propre de copier vers la sonde sans casser la livraison normale : un simple `output` en double ne suffit pas si une autre règle s'applique déjà.
 - **L'ordre des priorités** compte : la règle TCP 443 (300) doit primer sur le drop de h3 → h1 (250).
-- **Barème** : filtrage recette→prod prouvé par test (5), copie vers la sonde prouvée par compteurs (4), limite de débit prouvée par `iperf` (4), configuration rejouable et commitée (4), parcours expliqué avec `ofproto/trace` (3). Acquis à partir de 12/20 avec les critères 1 et 4 atteints.
+- **Exercice non noté** : l'évaluation des acquis se fera par un QCM ajouté ultérieurement. Ici, l'essentiel est que chacune des cinq exigences soit réalisée **et prouvée** (test, compteurs ou `ofproto/trace`).
 
 ---
 

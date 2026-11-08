@@ -18,11 +18,7 @@ Correctif : ne bloquer que les *requêtes* de la recette, pas les réponses, en 
 
 Le parcours du paquet dans le pipeline : la règle qui correspond, sa priorité, et l'action qui en résulte (`output:N` ou `drop`). On voit noir sur blanc pourquoi un paquet est transmis ou jeté.
 
-**4. Quel débit mesure `iperf` avant et après le meter ?**
-
-Avant : proche du débit maximal du lien (centaines de Mbit/s dans Mininet). Après le meter réglé à 5000 kbps : environ **5 Mbit/s**, l'excédent étant jeté par la bande `drop`.
-
-**5. Comment rejouer toute la configuration d'un coup ?**
+**4. Comment rejouer toute la configuration d'un coup ?**
 
 Écrire les règles dans un fichier et le charger avec `ovs-ofctl -O OpenFlow13 replace-flows s1 regles.txt` : `replace-flows` remplace toute la table d'un coup (atomique), `add-flows` ajoute sans effacer. C'est la configuration réseau traitée comme un fichier versionné.
 

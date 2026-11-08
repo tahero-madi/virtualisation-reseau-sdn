@@ -18,7 +18,7 @@ Parce que la règle autorise **rec1 → prd1** (`iifname rtr-eth0.20 oifname rtr
 
 **4. Quel EtherType signale l'étiquette, et quels numéros de VLAN voyez-vous ?**
 
-L'EtherType `0x8100` (802.1Q) signale la présence d'une étiquette. Sur le lien trunk `rtr-p`, la capture montre les VLAN **10, 20 et 30**, selon la zone d'où vient le paquet.
+L'EtherType `0x8100` (802.1Q) signale la présence d'une étiquette. Sur le lien trunk `rtr-port`, la capture montre les VLAN **10, 20 et 30**, selon la zone d'où vient le paquet.
 
 ---
 
