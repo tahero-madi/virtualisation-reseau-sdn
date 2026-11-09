@@ -25,7 +25,7 @@ Relevez l'adresse LAN de chaque machine avec `ip -br a`, et prenez un instantan�
 ### Étape 1 — Sur lab-a (guidé)
 
 ```bash
-LOCAL=10.10.0.11; REMOTE=10.10.0.12      # adresse LAN de CETTE machine, puis de l'AUTRE (ip -br a)
+LOCAL=10.10.0.10; REMOTE=10.10.0.11      # adresse LAN de CETTE machine, puis de l'AUTRE (ip -br a)
 IF=$(ip -o route get $REMOTE | grep -oP '(?<=dev )\S+'); echo "interface du LAN : $IF"
 MOI=vmA; IP=172.16.10.1; AUTRE=172.16.10.2
 
