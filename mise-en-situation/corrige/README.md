@@ -1,32 +1,70 @@
-# Corrigé de la mise en situation finale
+# Corrigé — Projet final SDN multi-sites
 
-> Corrigé formateur. Il existe plusieurs solutions correctes : l'essentiel est que chaque exigence soit **prouvée**.
+> Solution de référence et commandes de preuve. Les étudiants montent tout eux-mêmes ; ces scripts sont la référence du formateur.
 
-Une solution complète est dans [`regles_solution.txt`](regles_solution.txt). Elle s'appuie sur un groupe (la copie vers la sonde) et un meter (la limite de débit), à créer avant de charger les règles :
+## Pré-vol (formateur)
+
+Avant la session, sur une vraie paire lab-a/lab-b : lancer ONOS sur lab-a, puis sur lab-b `sudo bash verif_prevol.sh <IP_LAB_A>` — ping, TCP 6653, Open vSwitch et support VXLAN doivent être tous `[ OK ]`.
+
+## 1. Monter l'infrastructure
+
+Scripts de référence fournis dans ce dossier (ce sont eux que les étudiants doivent reconstituer) :
 
 ```bash
-OF="sudo ovs-ofctl -O OpenFlow13"
-$OF add-group s1 group_id=1,type=all,bucket=output:1,bucket=output:4   # vers h1 (prod) ET h4 (sonde)
-$OF add-meter s1 meter=1,kbps,band=type=drop,rate=10000                # 10 Mbit/s
-$OF replace-flows s1 regles_solution.txt
+# sur lab-a
+sudo bash infra_lab_a.sh <IP_LAB_A> <IP_LAB_B>    # ONOS + s1 + h1 (dev) + h2 (prod) + tunnel
+# sur lab-b
+sudo bash infra_lab_b.sh <IP_LAB_A> <IP_LAB_B>    # s2 + h3 (recette) + h4 (admin) + tunnel
 ```
 
-## Comment chaque exigence est tenue
+Points clés attendus dans leur montage : switches en OpenFlow 1.3 + fail-mode `secure` + dpid fixés ; tunnel VXLAN VNI 4000 entre `br-a` et `br-b` ; machines en `/24` commun, MTU 1450 ; `ofport_request` pour des numéros de ports déterministes.
 
-| Exigence | Règle | Preuve attendue |
-| --- | --- | --- |
-| Recette (h3) → prod (h1) en TCP 443 seulement | `priority=300` accepte le TCP 443 vers `group:1` ; `priority=250` jette le reste de h3 vers h1 | `h3 curl https://h1` (443) passe ; `h3 ping h1` et un autre port échouent |
-| Tout le trafic vers la prod copié vers la sonde (h4) | les paquets `nw_dst=10.0.0.1` partent vers `group:1`, qui diffuse sur les ports 1 **et** 4 | compteurs du port 4 (`dump-ports s1 4`) qui montent avec le trafic vers h1 |
-| Dev (h2) → prod (h1) limité à 10 Mbit/s | `priority=200` envoie ce flux vers `meter:1` puis `group:1` | `iperf h2 h1` plafonne à ~10 Mbit/s |
-| Configuration rejouable et commitée | tout est dans `regles_solution.txt`, rechargé par `replace-flows` | le fichier est versionné ; le relancer redonne le même état |
-| Parcours d'un paquet expliqué | — | `ofproto/trace s1 ...` sur un paquet h3 → h1:443 montre `group:1`, sur un autre port montre `drop` |
+Vérifier qu'ONOS voit les deux sites :
 
-## Points d'attention de correction
+```bash
+curl -s -u onos:rocks http://localhost:8181/onos/v1/devices | jq -r '.devices[].id'   # ...0001 et ...0002
+curl -s -u onos:rocks http://localhost:8181/onos/v1/links   | jq '.links | length'     # >= 2
+```
 
-- **Le groupe `all`** est la façon propre de copier vers la sonde sans casser la livraison normale : un simple `output` en double ne suffit pas si une autre règle s'applique déjà.
-- **L'ordre des priorités** compte : la règle TCP 443 (300) doit primer sur le drop de h3 → h1 (250).
-- **Exercice non noté** : l'évaluation des acquis se fera par un QCM ajouté ultérieurement. Ici, l'essentiel est que chacune des cinq exigences soit réalisée **et prouvée** (test, compteurs ou `ofproto/trace`).
+## 2. Passer en défaut-refus
 
----
+```text
+onos> app deactivate org.onosproject.fwd
+```
 
-[Énoncé](../README.md) · [Sommaire](../../README.md)
+ou en REST : `curl -s -u onos:rocks -X DELETE http://localhost:8181/onos/v1/applications/org.onosproject.fwd/active`. On **garde `proxyarp`** actif, sinon l'ARP ne traverse pas et les hôtes ne se découvrent pas entre sites.
+
+## 3. Déclarer la politique par intentions
+
+Voir [`politique_multisite.sh`](politique_multisite.sh) : cinq `HostToHostIntent` posées par l'API REST — dev↔prod, recette↔prod, admin↔dev, admin↔prod, admin↔recette. La paire **dev↔recette n'est pas déclarée**, donc interdite par le défaut-refus. Chaque appel renvoie **201** ; `onos> intents` doit montrer 5 intentions **INSTALLED**.
+
+## 4. Prouver
+
+**La matrice.** Depuis lab-a pour h1/h2, depuis lab-b pour h3/h4 :
+
+```bash
+# sur lab-a
+for d in 10.0.0.1 10.0.0.2 10.0.0.3 10.0.0.4; do
+  sudo ip netns exec h1 ping -c1 -W1 $d >/dev/null 2>&1 && echo "dev -> $d OK" || echo "dev -> $d ---"
+done
+# attendu : dev -> prod (.2) OK, admin (.4) OK ; dev -> recette (.3) ---
+```
+
+**Le trafic est inter-sites et encapsulé.** Sur lab-a, pendant un ping dev → admin (h4, sur lab-b) :
+
+```bash
+IF=$(ip -o route get <IP_LAB_B> | grep -oP '(?<=dev )\S+' | head -1)
+sudo tcpdump -n -i "$IF" -c 4 udp port 4789 &
+sudo ip netns exec h1 ping -c 3 10.0.0.4
+```
+
+On voit les paquets VXLAN (UDP 4789) : le trafic passe bien par le tunnel entre les deux hyperviseurs.
+
+**La topologie vue par ONOS** : 2 devices (`...0001`, `...0002`), le lien s1↔s2, 4 hôtes localisés chacun sur son switch.
+
+## Notes de mise au point
+
+- Lien s1↔s2 absent d'ONOS : vérifier que `vxlan0` est `up` des deux côtés, que `local_ip`/`remote_ip` ne sont pas inversés, et que les deux switches sont bien connectés au contrôleur (le lien n'apparaît qu'ensuite, via LLDP encapsulé dans le tunnel).
+- Hôtes absents : ils se révèlent au premier paquet ; `proxyarp` doit rester actif.
+- `fwd` réactivé par erreur rouvrirait tout : vérifier `onos> apps -a -s` après avoir posé la politique.
+- Repartir propre entre deux essais : `sudo bash ../reset.sh` sur chaque machine.

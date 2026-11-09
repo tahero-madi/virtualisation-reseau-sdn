@@ -10,7 +10,7 @@ Formation 1-041, deux jours. Neuf travaux pratiques et une mise en situation fin
 
 ## Corrigés
 
-Chaque TP a son corrigé dans un sous-dossier `corrige/` : `tp2b/corrige/` pour le TP2-B, par exemple. Il reprend les réponses aux questions et, pour la mise en situation, une solution complète (`regles_solution.txt`).
+Chaque TP a son corrigé dans un sous-dossier `corrige/` : `tp2b/corrige/` pour le TP2-B, par exemple. Il reprend les réponses aux questions et, pour le projet final, les scripts d'infrastructure et de politique de référence.
 
 Cherchez d'abord par vous-même : le corrigé sert à vous débloquer, ou à vérifier votre travail à la fin du TP.
 

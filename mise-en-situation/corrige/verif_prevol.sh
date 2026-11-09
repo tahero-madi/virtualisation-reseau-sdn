@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# verif_prevol.sh — vérifie qu'une paire lab-a / lab-b supporte le capstone distribué.
+# verif_prevol.sh — vérifie qu'une paire lab-a / lab-b supporte le projet final distribué.
 # À lancer SUR lab-b, avec ONOS DÉJÀ démarré sur lab-a.
 # Usage : sudo bash verif_prevol.sh <IP_LAB_A>
 A="${1:?Usage: sudo bash verif_prevol.sh <IP_LAB_A>}"
