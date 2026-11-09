@@ -4,6 +4,19 @@ Ce dépôt réunit les énoncés des travaux pratiques de la formation **1-041 �
 
 Chaque stagiaire dispose de deux machines Ubuntu 24.04 LTS, sur un LAN qui n'appartient qu'à lui : lab-a (4 vCPU, 8 Go de RAM, bureau graphique et Firefox), où se font tous les TP, et lab-b, un second hyperviseur léger qui ne sert qu'au TP2-B. On y accède par son lien personnel, depuis le navigateur du poste : lab-a en « Bureau distant » ou en « Terminal SSH », lab-b en « Terminal SSH ». Aucun port des machines n'est joignable directement.
 
+## Votre accès personnel
+
+Chaque apprenant ouvre **son propre lien**, qui donne accès à ses deux machines (lab-a et lab-b) :
+
+| Participant | Apprenant | Accès à lab-a et lab-b |
+| --- | --- | --- |
+| 01 | Rémi CURET | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32uufe4x8n |
+| 02 | Ismael KHAYI | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32nnfm7d2e |
+| 03 | Quentin LEJARD | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32pdnnwgwq |
+| 04 | Clément PILON | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32n5xuv8rw |
+
+> Ces liens sont personnels et donnent un accès direct à vos machines : ne les partagez pas en dehors de la session.
+
 | Besoin | Détail |
 | --- | --- |
 | Système | Ubuntu 24.04 LTS, avec un bureau graphique léger et Firefox sur lab-a, ou Debian 12 et 13 |
