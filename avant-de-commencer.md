@@ -8,12 +8,12 @@ Chaque stagiaire dispose de deux machines Ubuntu 24.04 LTS, sur un LAN qui n'app
 
 Chaque apprenant ouvre **son propre lien**, qui donne accès à ses deux machines (lab-a et lab-b) :
 
-| Participant | Apprenant | Accès à lab-a et lab-b |
-| --- | --- | --- |
-| 01 | Rémi CURET | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32uufe4x8n |
-| 02 | Ismael KHAYI | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32nnfm7d2e |
-| 03 | Quentin LEJARD | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32pdnnwgwq |
-| 04 | Clément PILON | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32n5xuv8rw |
+| Participant | Accès à lab-a et lab-b |
+| --- | --- |
+| 01 | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32uufe4x8n |
+| 02 | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32nnfm7d2e |
+| 03 | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32pdnnwgwq |
+| 04 | https://hra-ng.hexceos.cloud/p/ef7403c0-dade-4254-966e-f7ceb82afb32n5xuv8rw |
 
 > Ces liens sont personnels et donnent un accès direct à vos machines : ne les partagez pas en dehors de la session.
 
