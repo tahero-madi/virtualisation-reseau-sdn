@@ -70,14 +70,15 @@ Tester, côté Mininet :
 
 ```text
 mininet> h3 ping -c 2 h1                                                      # recette -> prod : bloqué
-mininet> h2 ping -c 2 h1                                                      # dev -> prod : passe (aucune règle ne le bloque)
+mininet> h2 ping -c 2 h1                                                      # dev -> prod : passe (acheminé par la règle de base de l'étape 1)
 mininet> h3 python3 -m http.server 80 &                                      # serveur web sur h3
 mininet> h2 curl -s -m 3 -o /dev/null -w "%{http_code}\n" http://10.0.0.3/   # dev -> recette en HTTP : 200
 mininet> h2 ping -c 2 h3                                                      # dev -> recette hors HTTP : bloqué
 mininet> h1 ping -c 2 h3                                                      # prod -> recette : voir question 2
 ```
 
-- chaque ligne teste un cas de la politique ; notez le résultat. Le dernier (`h1 ping h3`) révèle un piège étudié en question 2.
+- **Attention au mode `secure`** : le switch ne fait rien *par défaut*, mais il n'est pas vide — les règles d'acheminement de l'**étape 1** (priorité 100) assurent la connectivité de base. Ainsi `h2 → h1` passe grâce à ces règles, tandis que `h3 → h1` est jeté par le `drop` de priorité 200 ajouté à l'étape 2. En mode `secure`, « ça passe » veut toujours dire « une règle l'achemine », jamais « le switch commute tout seul ».
+- Chaque ligne teste un cas de la politique ; notez le résultat. Le dernier (`h1 ping h3`) révèle un piège étudié en question 2.
 
 ### Étape 3 — Expliquer un comportement
 
